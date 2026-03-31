@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>大老二 Big Two</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <div class="game-container">
+        <h1 class="game-title">♠ 大老二 Big Two ♥</h1>
+        
+        <!-- 開始畫面 -->
+        <div id="startScreen" class="start-screen">
+            <div class="start-content">
+                <h2>歡迎來到大老二！</h2>
+                <p>遊戲規則：四人對戰，先出完牌者獲勝</p>
+                <div class="name-input">
+                    <label for="playerName">你的名字：</label>
+                    <input type="text" id="playerName" value="玩家" maxlength="10">
+                </div>
+                <button class="btn btn-primary btn-large" onclick="game.create()">開始遊戲</button>
+                <div class="rules">
+                    <h3>牌型大小順序</h3>
+                    <p>同花順 > 鐵支 > 葫蘆 > 同花 > 順子 > 對子 > 單張</p>
+                    <h3>點數大小順序</h3>
+                    <p>2 > A > K > Q > J > 10 > 9 > 8 > 7 > 6 > 5 > 4 > 3</p>
+                    <h3>花色大小順序</h3>
+                    <p>♠黑桃 > ♥紅心 > ♦方塊 > ♣梅花</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 遊戲畫面 -->
+        <div id="gameScreen" class="game-screen hidden">
+            <div class="game-table">
+                <!-- 玩家2（上方） -->
+                <div class="player-area player-top" id="player2">
+                    <div class="player-info">
+                        <span class="player-name">電腦 2</span>
+                        <span class="card-count">13 張</span>
+                    </div>
+                    <div class="player-hand back-only"></div>
+                </div>
+
+                <!-- 玩家1（左方） -->
+                <div class="player-area player-left" id="player1">
+                    <div class="player-info">
+                        <span class="player-name">電腦 1</span>
+                        <span class="card-count">13 張</span>
+                    </div>
+                    <div class="player-hand back-only"></div>
+                </div>
+
+                <!-- 遊戲區域中央 -->
+                <div class="game-center">
+                    <div class="last-play-info" id="lastPlayInfo">
+                        等待開始遊戲...
+                    </div>
+                    <div class="play-area" id="playArea">
+                        <!-- 出牌區域 -->
+                    </div>
+                    <div class="game-controls">
+                        <button id="passBtn" class="btn btn-secondary" onclick="game.pass()" disabled>跳過</button>
+                        <button id="playBtn" class="btn btn-success" onclick="game.play()" disabled>出牌</button>
+                        <button id="hintBtn" class="btn btn-hint" onclick="game.hint()">提示</button>
+                        <button id="sortBtn" class="btn btn-info" onclick="game.sortHand()">排序</button>
+                    </div>
+                </div>
+
+                <!-- 玩家3（右方） -->
+                <div class="player-area player-right" id="player3">
+                    <div class="player-info">
+                        <span class="player-name">電腦 3</span>
+                        <span class="card-count">13 張</span>
+                    </div>
+                    <div class="player-hand back-only"></div>
+                </div>
+
+                <!-- 玩家0（自己，下方） -->
+                <div class="player-area player-bottom" id="player0">
+                    <div class="player-info">
+                        <span class="player-name" id="myName">你</span>
+                        <span class="card-count" id="myCardCount">13 張</span>
+                    </div>
+                    <div class="player-hand" id="myHand">
+                        <!-- 我的手牌 -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- 遊戲記錄 -->
+            <div class="game-log">
+                <h3>遊戲記錄</h3>
+                <div class="log-content" id="logContent"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 遊戲結束彈窗 -->
+    <div class="modal" id="gameOverModal">
+        <div class="modal-content">
+            <h2>🎉 遊戲結束！</h2>
+            <div class="rankings" id="rankings"></div>
+            <button class="btn btn-primary" onclick="game.restart()">再玩一次</button>
+        </div>
+    </div>
+
+    <!-- 提示訊息 -->
+    <div id="toast" class="toast"></div>
+
+    <script src="/js/game.js"></script>
+</body>
+</html>

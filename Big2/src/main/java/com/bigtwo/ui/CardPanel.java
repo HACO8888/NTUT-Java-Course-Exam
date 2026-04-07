@@ -12,6 +12,7 @@ public class CardPanel extends JPanel {
     public static final int CARD_HEIGHT = 96;
     private static final int ARC = 12;
     public static final int SHADOW = 4;
+    public static final int MAX_LIFT = 12; // max upward movement when selected
 
     private final Card card;
     private boolean selected;
@@ -21,7 +22,7 @@ public class CardPanel extends JPanel {
     public CardPanel(Card card, boolean faceDown) {
         this.card = card;
         this.faceDown = faceDown;
-        setPreferredSize(new Dimension(CARD_WIDTH + SHADOW, CARD_HEIGHT + SHADOW));
+        setPreferredSize(new Dimension(CARD_WIDTH + SHADOW, CARD_HEIGHT + SHADOW + MAX_LIFT));
         setOpaque(false);
     }
 
@@ -50,10 +51,10 @@ public class CardPanel extends JPanel {
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_LCD_HRGB);
 
-        int lift = selected ? 10 : (hovered ? 4 : 0);
+        int lift = selected ? MAX_LIFT : (hovered ? 4 : 0);
         int cardX = 0;
-        int cardY = CARD_HEIGHT + SHADOW - CARD_HEIGHT - lift;
-        int shadowY = CARD_HEIGHT + SHADOW - CARD_HEIGHT;
+        int cardY = MAX_LIFT - lift;   // normal: MAX_LIFT, selected: 0, hovered: MAX_LIFT-4
+        int shadowY = MAX_LIFT;        // shadow stays at rest position
 
         // Drop shadow
         int shadowAlpha = selected ? 90 : 50;

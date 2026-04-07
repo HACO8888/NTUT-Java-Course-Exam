@@ -78,17 +78,19 @@ public class HandPanel extends JPanel {
     @Override
     public Dimension getPreferredSize() {
         int n = cardPanels.size();
-        if (n == 0) return new Dimension(200, CardPanel.CARD_HEIGHT + 20);
+        int totalH = CardPanel.CARD_HEIGHT + CardPanel.SHADOW + CardPanel.MAX_LIFT + 4;
+        if (n == 0) return new Dimension(200, totalH);
         int width = OVERLAP * (n - 1) + CardPanel.CARD_WIDTH + CardPanel.SHADOW + 8;
-        return new Dimension(width, CardPanel.CARD_HEIGHT + CardPanel.SHADOW + 14);
+        return new Dimension(width, totalH);
     }
 
     @Override
     public void doLayout() {
         int n = cardPanels.size();
+        int cardH = CardPanel.CARD_HEIGHT + CardPanel.SHADOW + CardPanel.MAX_LIFT;
         for (int i = 0; i < n; i++) {
             CardPanel cp = cardPanels.get(i);
-            cp.setBounds(i * OVERLAP, 4, CardPanel.CARD_WIDTH + CardPanel.SHADOW, CardPanel.CARD_HEIGHT + CardPanel.SHADOW);
+            cp.setBounds(i * OVERLAP, 0, CardPanel.CARD_WIDTH + CardPanel.SHADOW, cardH);
         }
     }
 }

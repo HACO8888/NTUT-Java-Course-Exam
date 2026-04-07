@@ -9,7 +9,9 @@ public class BigTwoGame {
     private Play lastPlay;
     private int lastPlayerIndex; // who made the last non-pass play
     private boolean gameOver;
+    private boolean firstTurn;
     private Player winner;
+    private String lastPlayedByName = "";
     private final List<String> log = new ArrayList<>();
 
     public BigTwoGame() {
@@ -39,17 +41,14 @@ public class BigTwoGame {
         lastPlay = null;
         lastPlayerIndex = currentPlayerIndex;
         gameOver = false;
+        firstTurn = true;
         winner = null;
         log.clear();
         log.add("遊戲開始！" + players.get(currentPlayerIndex).getName() + " 持有梅3，先手出牌。");
     }
 
-    public boolean isFirstTurn() {
-        return lastPlay == null;
-    }
-
     public boolean mustIncludeClubThree() {
-        return lastPlay == null;
+        return firstTurn;
     }
 
     public Player getCurrentPlayer() {
@@ -100,8 +99,8 @@ public class BigTwoGame {
             return "無效的牌型！";
         }
 
-        // First turn must include Club Three
-        if (lastPlay == null) {
+        // Very first play of the game must include Club Three
+        if (firstTurn) {
             boolean hasClubThree = false;
             for (Card c : play.getCards()) {
                 if (c.getRank() == Rank.THREE && c.getSuit() == Suit.CLUBS) {
@@ -112,6 +111,7 @@ public class BigTwoGame {
             if (!hasClubThree) {
                 return "第一手必須包含梅花3！";
             }
+            firstTurn = false;
         }
 
         // Must beat last play (if there is one and it's not your own)
@@ -126,6 +126,7 @@ public class BigTwoGame {
         log.add(player.getName() + " 出牌: " + play);
         lastPlay = play;
         lastPlayerIndex = currentPlayerIndex;
+        lastPlayedByName = player.getName();
 
         if (player.hasWon()) {
             gameOver = true;
@@ -150,6 +151,8 @@ public class BigTwoGame {
             lastPlay = null;
         }
     }
+
+    public String getLastPlayedByName() { return lastPlayedByName; }
 
     /**
      * Returns true if the current player can pass.

@@ -1,9 +1,17 @@
 @echo off
-title 大老二 - Big Two
+chcp 65001 >nul
+title Big Two
+
+where java >nul 2>&1
+if %errorlevel% neq 0 (
+    echo Java not found. Please install Java 11 or later.
+    echo Download: https://adoptium.net/
+    pause
+    exit /b 1
+)
+
 java -jar "%~dp0big2.jar"
 if %errorlevel% neq 0 (
-    echo.
-    echo [錯誤] 請確認已安裝 Java 11 或以上版本
-    echo 下載網址: https://adoptium.net/
+    echo Failed to launch. Make sure Java 11+ is installed.
     pause
 )

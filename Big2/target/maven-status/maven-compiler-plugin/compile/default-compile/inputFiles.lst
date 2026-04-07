@@ -1,0 +1,15 @@
+/Users/haco/Project/Haco/NTUT-Java-Course-Exam/Big2/src/main/java/com/bigtwo/Main.java
+/Users/haco/Project/Haco/NTUT-Java-Course-Exam/Big2/src/main/java/com/bigtwo/ai/AIPlayer.java
+/Users/haco/Project/Haco/NTUT-Java-Course-Exam/Big2/src/main/java/com/bigtwo/game/BigTwoGame.java
+/Users/haco/Project/Haco/NTUT-Java-Course-Exam/Big2/src/main/java/com/bigtwo/model/Card.java
+/Users/haco/Project/Haco/NTUT-Java-Course-Exam/Big2/src/main/java/com/bigtwo/model/Deck.java
+/Users/haco/Project/Haco/NTUT-Java-Course-Exam/Big2/src/main/java/com/bigtwo/model/HandType.java
+/Users/haco/Project/Haco/NTUT-Java-Course-Exam/Big2/src/main/java/com/bigtwo/model/Play.java
+/Users/haco/Project/Haco/NTUT-Java-Course-Exam/Big2/src/main/java/com/bigtwo/model/Player.java
+/Users/haco/Project/Haco/NTUT-Java-Course-Exam/Big2/src/main/java/com/bigtwo/model/Rank.java
+/Users/haco/Project/Haco/NTUT-Java-Course-Exam/Big2/src/main/java/com/bigtwo/model/Suit.java
+/Users/haco/Project/Haco/NTUT-Java-Course-Exam/Big2/src/main/java/com/bigtwo/ui/CardPanel.java
+/Users/haco/Project/Haco/NTUT-Java-Course-Exam/Big2/src/main/java/com/bigtwo/ui/GameWindow.java
+/Users/haco/Project/Haco/NTUT-Java-Course-Exam/Big2/src/main/java/com/bigtwo/ui/HandPanel.java
+/Users/haco/Project/Haco/NTUT-Java-Course-Exam/Big2/src/main/java/com/bigtwo/ui/PlayerInfoPanel.java
+/Users/haco/Project/Haco/NTUT-Java-Course-Exam/Big2/src/main/java/com/bigtwo/ui/TablePanel.java

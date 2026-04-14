@@ -1,6 +1,8 @@
 package com.draw.ui.toolbar;
 
 import com.draw.tool.*;
+import com.draw.tool.CropTool;
+import com.draw.tool.SmudgeTool;
 import com.draw.util.DrawIcons;
 
 import javax.swing.*;
@@ -22,6 +24,8 @@ public class ToolBar extends JPanel {
     private final BrushTool    brushTool    = new BrushTool();
     private final EraserTool   eraserTool   = new EraserTool();
     private final SprayTool    sprayTool    = new SprayTool();
+    private final SmudgeTool   smudgeTool   = new SmudgeTool();
+    private final CropTool     cropTool     = new CropTool();
     private final LineTool     lineTool     = new LineTool();
     private final RectangleTool rectTool    = new RectangleTool();
     private final EllipseTool  ellipseTool  = new EllipseTool();
@@ -57,6 +61,7 @@ public class ToolBar extends JPanel {
         addEntry("Brush",       "Brush (B)",       DrawIcons.brush(ic),     brushTool);
         addEntry("Eraser",      "Eraser (E)",      DrawIcons.eraser(ic),    eraserTool);
         addEntry("Spray",       "Spray (S)",       DrawIcons.spray(ic),     sprayTool);
+        addEntry("Smudge",      "Smudge (M)",      DrawIcons.smudge(ic),    smudgeTool);
         addSep();
         // Shapes + Gradient
         addEntry("Line",        "Line (L)",        DrawIcons.line(ic),      lineTool);
@@ -66,6 +71,7 @@ public class ToolBar extends JPanel {
         addEntry("Gradient",    "Gradient (U)",    DrawIcons.gradient(ic),  gradientTool);
         addSep();
         // Utility
+        addEntry("Crop",        "Crop (C)",        DrawIcons.crop(ic),      cropTool);
         addEntry("Fill",        "Fill (G)",        DrawIcons.fill(ic),      fillTool);
         addEntry("Text",        "Text (T)",        DrawIcons.text(ic),      textTool);
         addEntry("Eyedropper",  "Eyedropper (I)",  DrawIcons.eyedropper(ic), null); // null = set after
@@ -77,6 +83,7 @@ public class ToolBar extends JPanel {
     }
 
     public RectSelectTool getSelectTool() { return selectTool; }
+    public CropTool getCropTool() { return cropTool; }
 
     public void setToolChangeCallback(Consumer<Tool> cb) { this.toolChangeCallback = cb; }
 

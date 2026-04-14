@@ -2,6 +2,7 @@ package com.draw.canvas;
 
 import com.draw.model.CanvasDocument;
 import com.draw.tool.*;
+import com.draw.tool.CropTool;
 import com.draw.tool.RectSelectTool;
 
 import javax.swing.*;
@@ -55,6 +56,7 @@ public class CanvasPanel extends JPanel implements TextTool.TextToolListener {
     private StatusCallback statusCallback;
     private EyedropperTool eyedropperTool; // used for Alt+click
     private JPopupMenu rightClickMenu;
+    private Runnable cropCallback;         // called when Enter pressed with CropTool
 
     private TexturePaint checkerPaint;
 
@@ -80,9 +82,9 @@ public class CanvasPanel extends JPanel implements TextTool.TextToolListener {
         setupKeyListeners();
         setFocusable(true);
 
-        // Marching ants animation timer (repaint ~15fps when selection tool is active)
+        // Marching ants / crop overlay animation timer (~15fps)
         new javax.swing.Timer(67, e -> {
-            if (activeTool instanceof RectSelectTool) repaint();
+            if (activeTool instanceof RectSelectTool || activeTool instanceof CropTool) repaint();
         }).start();
     }
 
@@ -116,6 +118,7 @@ public class CanvasPanel extends JPanel implements TextTool.TextToolListener {
     public void setStatusCallback(StatusCallback cb) { this.statusCallback = cb; }
     public void setEyedropperTool(EyedropperTool et) { this.eyedropperTool = et; }
     public void setRightClickMenu(JPopupMenu menu) { this.rightClickMenu = menu; }
+    public void setCropCallback(Runnable cb) { this.cropCallback = cb; }
     public DrawContext getDrawContext() { return drawContext; }
 
     // ---- Selection operations (delegated to RectSelectTool if active) ----
@@ -503,6 +506,10 @@ public class CanvasPanel extends JPanel implements TextTool.TextToolListener {
                     clearOverlay();
                     repaint();
                 }
+                if (e.getKeyCode() == KeyEvent.VK_ENTER && activeTool instanceof CropTool
+                        && cropCallback != null) {
+                    cropCallback.run();
+                }
             }
 
             @Override
@@ -521,6 +528,9 @@ public class CanvasPanel extends JPanel implements TextTool.TextToolListener {
             activeTool.onPaint(overlayImage, drawContext);
         }
     }
+
+    /** Called externally when overlay should be refreshed (e.g. after Select All). */
+    public void updateOverlayPublic() { updateOverlay(); }
 
     public void clearOverlay() {
         if (overlayImage == null) return;

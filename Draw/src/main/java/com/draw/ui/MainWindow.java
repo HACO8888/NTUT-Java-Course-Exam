@@ -4,6 +4,8 @@ import com.draw.canvas.CanvasPanel;
 import com.draw.model.CanvasDocument;
 import com.draw.model.Layer;
 import com.draw.tool.*;
+import com.draw.tool.CropTool;
+import com.draw.tool.RectSelectTool;
 import com.draw.ui.dialog.CanvasSizeDialog;
 import com.draw.ui.dialog.NewDocumentDialog;
 import com.draw.ui.panel.*;
@@ -14,7 +16,7 @@ import com.draw.util.ImageUtil;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
-import java.awt.image.BufferedImage;
+import java.awt.image.*;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayDeque;
@@ -164,6 +166,25 @@ public class MainWindow extends JFrame {
         scrollPane.getHorizontalScrollBar().setUnitIncrement(20);
         scrollPane.getVerticalScrollBar().setUnitIncrement(20);
 
+        // Crop wiring: both Enter key and toolbar button trigger the same action
+        Runnable applyCrop = () -> {
+            CropTool ct = toolBar.getCropTool();
+            java.awt.Rectangle r = ct.getCropRect();
+            if (r != null && r.width > 4 && r.height > 4) {
+                doc.crop(r);
+                ct.clearCrop();
+                canvasPanel.clearOverlay();
+                canvasPanel.setDoc(doc);
+                rebuildLayers();
+                updateDrawContext();
+                statusBar.setCanvasSize(doc.getWidth(), doc.getHeight());
+                doc.markDirty();
+                updateTitle();
+            }
+        };
+        canvasPanel.setCropCallback(applyCrop);
+        toolOptionsBar.setCropApplyCallback(applyCrop);
+
         // Right-click context menu on canvas
         canvasPanel.setRightClickMenu(buildCanvasContextMenu());
 
@@ -284,6 +305,12 @@ public class MainWindow extends JFrame {
         image.add(menuItem("Flip Vertical", null, () -> flipCanvas(false)));
         bar.add(image);
 
+        // Select
+        JMenu select = new JMenu("Select");
+        select.add(menuItem("Select All", "ctrl A", this::selectAll));
+        select.add(menuItem("Deselect",   "ctrl D", this::deselect));
+        bar.add(select);
+
         // View
         JMenu view = new JMenu("View");
         view.add(menuItem("Zoom In", "ctrl EQUALS", () -> canvasPanel.zoomIn()));
@@ -300,6 +327,18 @@ public class MainWindow extends JFrame {
         rulerItem.addActionListener(e -> canvasPanel.setRulersEnabled(rulerItem.isSelected()));
         view.add(rulerItem);
         bar.add(view);
+
+        // Filter
+        JMenu filter = new JMenu("Filter");
+        filter.add(menuItem("Gaussian Blur...",    null, this::filterBlur));
+        filter.add(menuItem("Sharpen",             null, this::filterSharpen));
+        filter.addSeparator();
+        filter.add(menuItem("Invert Colors",       null, this::filterInvert));
+        filter.add(menuItem("Grayscale",           null, this::filterGrayscale));
+        filter.addSeparator();
+        filter.add(menuItem("Brightness / Contrast...", null, this::filterBrightnessContrast));
+        filter.add(menuItem("Hue / Saturation...", null, this::filterHueSaturation));
+        bar.add(filter);
 
         return bar;
     }
@@ -347,6 +386,8 @@ public class MainWindow extends JFrame {
         bindKey(im, am, "T", "toolText",    () -> toolBar.selectTool("Text"));
         bindKey(im, am, "I", "toolEye",     () -> toolBar.selectTool("Eyedropper"));
         bindKey(im, am, "S", "toolSpray",   () -> toolBar.selectTool("Spray"));
+        bindKey(im, am, "M", "toolSmudge",  () -> toolBar.selectTool("Smudge"));
+        bindKey(im, am, "C", "toolCrop",    () -> toolBar.selectTool("Crop"));
 
         // Bracket shortcuts for brush size
         bindKey(im, am, "OPEN_BRACKET",  "brushSizeDown", () -> toolOptionsBar.adjustBrushSize(-5));
@@ -354,6 +395,10 @@ public class MainWindow extends JFrame {
 
         // X = swap FG/BG colors
         bindKey(im, am, "X", "swapColors", () -> colorPanel.swapColors());
+
+        // Select All / Deselect
+        bindKey(im, am, "ctrl A", "selectAll", this::selectAll);
+        bindKey(im, am, "ctrl D", "deselect",  this::deselect);
 
         // Selection clipboard (only active when Select tool is in use)
         bindKey(im, am, "ctrl C", "copy",   () -> canvasPanel.copySelection());
@@ -567,6 +612,243 @@ public class MainWindow extends JFrame {
         doc.getLayerModel().fireLayersChanged();
         doc.markDirty();
     }
+
+    // ---- Select ----
+
+    private void selectAll() {
+        toolBar.selectTool("Select");
+        RectSelectTool st = toolBar.getSelectTool();
+        st.setFullSelection(doc.getWidth(), doc.getHeight());
+        canvasPanel.updateOverlayPublic();
+        canvasPanel.repaint();
+    }
+
+    private void deselect() {
+        if (toolBar.getActiveTool() instanceof RectSelectTool) {
+            toolBar.getSelectTool().deselect();
+            canvasPanel.clearOverlay();
+            canvasPanel.repaint();
+        }
+    }
+
+    // ---- Filters ----
+
+    private void filterBlur() {
+        Layer active = doc.getLayerModel().getActive();
+        if (active == null) return;
+        String input = JOptionPane.showInputDialog(this, "Blur radius (1-20):", "Gaussian Blur", JOptionPane.PLAIN_MESSAGE);
+        if (input == null) return;
+        int radius;
+        try { radius = Math.max(1, Math.min(20, Integer.parseInt(input.trim()))); }
+        catch (NumberFormatException ex) { return; }
+
+        BufferedImage before = com.draw.command.DrawStrokeCommand.snapshot(active);
+        applyGaussianBlur(active.getImage(), radius);
+        doc.getHistory().push(new com.draw.command.DrawStrokeCommand(active,
+                before, com.draw.command.DrawStrokeCommand.snapshot(active)));
+        doc.getLayerModel().fireLayersChanged();
+        doc.markDirty();
+    }
+
+    private void applyGaussianBlur(BufferedImage img, int radius) {
+        int size = radius * 2 + 1;
+        float[] data = new float[size * size];
+        float sigma = radius / 3f + 0.5f;
+        float sum = 0;
+        for (int y = 0; y < size; y++) {
+            for (int x = 0; x < size; x++) {
+                float dx = x - radius, dy = y - radius;
+                data[y * size + x] = (float)Math.exp(-(dx*dx + dy*dy) / (2 * sigma * sigma));
+                sum += data[y * size + x];
+            }
+        }
+        for (int i = 0; i < data.length; i++) data[i] /= sum;
+
+        Kernel kernel = new Kernel(size, size, data);
+        ConvolveOp op = new ConvolveOp(kernel, ConvolveOp.EDGE_NO_OP, null);
+        BufferedImage tmp = op.filter(img, null);
+        Graphics2D g2 = img.createGraphics();
+        g2.setComposite(AlphaComposite.getInstance(AlphaComposite.CLEAR));
+        g2.fillRect(0, 0, img.getWidth(), img.getHeight());
+        g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER));
+        g2.drawImage(tmp, 0, 0, null);
+        g2.dispose();
+    }
+
+    private void filterSharpen() {
+        Layer active = doc.getLayerModel().getActive();
+        if (active == null) return;
+        BufferedImage before = com.draw.command.DrawStrokeCommand.snapshot(active);
+
+        float[] sharpenData = {
+            0f,  -1f,  0f,
+           -1f,   5f, -1f,
+            0f,  -1f,  0f
+        };
+        Kernel kernel = new Kernel(3, 3, sharpenData);
+        ConvolveOp op = new ConvolveOp(kernel, ConvolveOp.EDGE_NO_OP, null);
+        BufferedImage img = active.getImage();
+        BufferedImage tmp = op.filter(img, null);
+        Graphics2D g2 = img.createGraphics();
+        g2.setComposite(AlphaComposite.getInstance(AlphaComposite.CLEAR));
+        g2.fillRect(0, 0, img.getWidth(), img.getHeight());
+        g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER));
+        g2.drawImage(tmp, 0, 0, null);
+        g2.dispose();
+
+        doc.getHistory().push(new com.draw.command.DrawStrokeCommand(active,
+                before, com.draw.command.DrawStrokeCommand.snapshot(active)));
+        doc.getLayerModel().fireLayersChanged();
+        doc.markDirty();
+    }
+
+    private void filterInvert() {
+        Layer active = doc.getLayerModel().getActive();
+        if (active == null) return;
+        BufferedImage before = com.draw.command.DrawStrokeCommand.snapshot(active);
+        BufferedImage img = active.getImage();
+        int w = img.getWidth(), h = img.getHeight();
+        int[] pixels = new int[w * h];
+        img.getRGB(0, 0, w, h, pixels, 0, w);
+        for (int i = 0; i < pixels.length; i++) {
+            int a = pixels[i] & 0xFF000000;
+            pixels[i] = a | (~pixels[i] & 0x00FFFFFF);
+        }
+        img.setRGB(0, 0, w, h, pixels, 0, w);
+        doc.getHistory().push(new com.draw.command.DrawStrokeCommand(active,
+                before, com.draw.command.DrawStrokeCommand.snapshot(active)));
+        doc.getLayerModel().fireLayersChanged();
+        doc.markDirty();
+    }
+
+    private void filterGrayscale() {
+        Layer active = doc.getLayerModel().getActive();
+        if (active == null) return;
+        BufferedImage before = com.draw.command.DrawStrokeCommand.snapshot(active);
+        BufferedImage img = active.getImage();
+        int w = img.getWidth(), h = img.getHeight();
+        int[] pixels = new int[w * h];
+        img.getRGB(0, 0, w, h, pixels, 0, w);
+        for (int i = 0; i < pixels.length; i++) {
+            int p = pixels[i];
+            int a = (p >>> 24) & 0xFF;
+            int r = (p >> 16) & 0xFF;
+            int g = (p >> 8)  & 0xFF;
+            int b =  p        & 0xFF;
+            // Luminance weights: 0.299R + 0.587G + 0.114B
+            int gray = (r * 77 + g * 150 + b * 29) >> 8;
+            pixels[i] = (a << 24) | (gray << 16) | (gray << 8) | gray;
+        }
+        img.setRGB(0, 0, w, h, pixels, 0, w);
+        doc.getHistory().push(new com.draw.command.DrawStrokeCommand(active,
+                before, com.draw.command.DrawStrokeCommand.snapshot(active)));
+        doc.getLayerModel().fireLayersChanged();
+        doc.markDirty();
+    }
+
+    private void filterBrightnessContrast() {
+        Layer active = doc.getLayerModel().getActive();
+        if (active == null) return;
+
+        JSlider brightnessSlider = new JSlider(-150, 150, 0);
+        JSlider contrastSlider   = new JSlider(-100, 100, 0);
+        brightnessSlider.setMajorTickSpacing(50);
+        contrastSlider.setMajorTickSpacing(50);
+        brightnessSlider.setPaintTicks(true); brightnessSlider.setPaintLabels(true);
+        contrastSlider.setPaintTicks(true);   contrastSlider.setPaintLabels(true);
+
+        JPanel panel = new JPanel(new GridLayout(4, 1, 4, 4));
+        panel.add(new JLabel("Brightness:"));
+        panel.add(brightnessSlider);
+        panel.add(new JLabel("Contrast:"));
+        panel.add(contrastSlider);
+
+        int result = JOptionPane.showConfirmDialog(this, panel,
+                "Brightness / Contrast", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+        if (result != JOptionPane.OK_OPTION) return;
+
+        int bright = brightnessSlider.getValue();
+        int contrast = contrastSlider.getValue();
+        BufferedImage before = com.draw.command.DrawStrokeCommand.snapshot(active);
+        applyBrightnessContrast(active.getImage(), bright, contrast);
+        doc.getHistory().push(new com.draw.command.DrawStrokeCommand(active,
+                before, com.draw.command.DrawStrokeCommand.snapshot(active)));
+        doc.getLayerModel().fireLayersChanged();
+        doc.markDirty();
+    }
+
+    private void applyBrightnessContrast(BufferedImage img, int brightness, int contrast) {
+        int w = img.getWidth(), h = img.getHeight();
+        int[] pixels = new int[w * h];
+        img.getRGB(0, 0, w, h, pixels, 0, w);
+        // Contrast factor
+        double factor = (259.0 * (contrast + 255)) / (255.0 * (259 - contrast));
+        for (int i = 0; i < pixels.length; i++) {
+            int p = pixels[i];
+            int a = (p >>> 24) & 0xFF;
+            int r = (p >> 16) & 0xFF;
+            int g = (p >> 8)  & 0xFF;
+            int b =  p        & 0xFF;
+            // Apply contrast then brightness
+            r = clampChannel((int)(factor * (r - 128) + 128) + brightness);
+            g = clampChannel((int)(factor * (g - 128) + 128) + brightness);
+            b = clampChannel((int)(factor * (b - 128) + 128) + brightness);
+            pixels[i] = (a << 24) | (r << 16) | (g << 8) | b;
+        }
+        img.setRGB(0, 0, w, h, pixels, 0, w);
+    }
+
+    private void filterHueSaturation() {
+        Layer active = doc.getLayerModel().getActive();
+        if (active == null) return;
+
+        JSlider hueSlider  = new JSlider(-180, 180, 0);
+        JSlider satSlider  = new JSlider(-100, 100, 0);
+        JSlider lightSlider = new JSlider(-100, 100, 0);
+        hueSlider.setMajorTickSpacing(60);   hueSlider.setPaintTicks(true); hueSlider.setPaintLabels(true);
+        satSlider.setMajorTickSpacing(50);   satSlider.setPaintTicks(true); satSlider.setPaintLabels(true);
+        lightSlider.setMajorTickSpacing(50); lightSlider.setPaintTicks(true); lightSlider.setPaintLabels(true);
+
+        JPanel panel = new JPanel(new GridLayout(6, 1, 4, 4));
+        panel.add(new JLabel("Hue shift:"));       panel.add(hueSlider);
+        panel.add(new JLabel("Saturation:"));       panel.add(satSlider);
+        panel.add(new JLabel("Lightness:"));        panel.add(lightSlider);
+
+        int result = JOptionPane.showConfirmDialog(this, panel,
+                "Hue / Saturation", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+        if (result != JOptionPane.OK_OPTION) return;
+
+        BufferedImage before = com.draw.command.DrawStrokeCommand.snapshot(active);
+        applyHueSaturation(active.getImage(),
+                hueSlider.getValue(), satSlider.getValue() / 100f, lightSlider.getValue() / 100f);
+        doc.getHistory().push(new com.draw.command.DrawStrokeCommand(active,
+                before, com.draw.command.DrawStrokeCommand.snapshot(active)));
+        doc.getLayerModel().fireLayersChanged();
+        doc.markDirty();
+    }
+
+    private void applyHueSaturation(BufferedImage img, int hueShift, float satDelta, float lightDelta) {
+        int w = img.getWidth(), h = img.getHeight();
+        int[] pixels = new int[w * h];
+        img.getRGB(0, 0, w, h, pixels, 0, w);
+        for (int i = 0; i < pixels.length; i++) {
+            int p = pixels[i];
+            int a = (p >>> 24) & 0xFF;
+            if (a == 0) continue;
+            float r = ((p >> 16) & 0xFF) / 255f;
+            float g = ((p >> 8)  & 0xFF) / 255f;
+            float b = ( p        & 0xFF) / 255f;
+            float[] hsb = Color.RGBtoHSB((int)(r*255), (int)(g*255), (int)(b*255), null);
+            hsb[0] = ((hsb[0] + hueShift / 360f) % 1f + 1f) % 1f;
+            hsb[1] = Math.max(0, Math.min(1, hsb[1] + satDelta));
+            hsb[2] = Math.max(0, Math.min(1, hsb[2] + lightDelta));
+            int rgb = Color.HSBtoRGB(hsb[0], hsb[1], hsb[2]);
+            pixels[i] = (a << 24) | (rgb & 0x00FFFFFF);
+        }
+        img.setRGB(0, 0, w, h, pixels, 0, w);
+    }
+
+    private static int clampChannel(int v) { return v < 0 ? 0 : v > 255 ? 255 : v; }
 
     // ---- Helpers ----
 

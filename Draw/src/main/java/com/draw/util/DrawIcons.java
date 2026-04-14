@@ -277,6 +277,21 @@ public class DrawIcons {
         });
     }
 
+    public static ImageIcon smudge(Color color) {
+        return make(color, g -> {
+            g.setStroke(new BasicStroke(1.8f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+            // Finger shape
+            g.drawArc(8, 3, 8, 8, 0, 180);
+            g.drawLine(8, 7, 6, 18);
+            g.drawLine(16, 7, 18, 18);
+            g.drawLine(6, 18, 18, 18);
+            // Smear lines
+            g.setStroke(new BasicStroke(1.2f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+            g.drawArc(3, 15, 8, 6, 90, 180);
+            g.drawArc(13, 15, 8, 6, 270, 180);
+        });
+    }
+
     public static ImageIcon gradient(Color color) {
         return make(color, g -> {
             // Gradient bar

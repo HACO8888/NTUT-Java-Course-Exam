@@ -1,7 +1,9 @@
 package com.draw.ui.panel;
 
 import com.draw.tool.*;
+import com.draw.tool.CropTool;
 import com.draw.tool.RectSelectTool;
+import com.draw.tool.SmudgeTool;
 
 import javax.swing.*;
 import javax.swing.event.ChangeListener;
@@ -53,6 +55,7 @@ public class ToolOptionsBar extends JPanel {
     private Consumer<Integer> toleranceCallback;
     private Consumer<String[]> textFontCallback; // [name, bold, italic, size]
     private Consumer<Float> lineWidthCallback;
+    private Runnable cropApplyCallback;
 
     public ToolOptionsBar() {
         setBackground(BAR_BG);
@@ -80,6 +83,8 @@ public class ToolOptionsBar extends JPanel {
         cardPanel.add(buildSprayCard(),    "spray");
         cardPanel.add(buildSelectCard(),   "select");
         cardPanel.add(buildGradientCard(), "gradient");
+        cardPanel.add(buildCropCard(),     "crop");
+        cardPanel.add(buildSmudgeCard(),   "smudge");
         cardPanel.add(buildDefaultCard(),  "default");
 
         add(cardPanel, BorderLayout.CENTER);
@@ -126,10 +131,14 @@ public class ToolOptionsBar extends JPanel {
             cards.show(cardPanel, "line");
         } else if (tool instanceof SprayTool) {
             cards.show(cardPanel, "spray");
+        } else if (tool instanceof SmudgeTool) {
+            cards.show(cardPanel, "smudge");
         } else if (tool instanceof RectSelectTool) {
             cards.show(cardPanel, "select");
         } else if (tool instanceof GradientTool) {
             cards.show(cardPanel, "gradient");
+        } else if (tool instanceof CropTool) {
+            cards.show(cardPanel, "crop");
         } else {
             cards.show(cardPanel, "default");
         }
@@ -143,6 +152,7 @@ public class ToolOptionsBar extends JPanel {
     public void setToleranceCallback(Consumer<Integer> cb) { this.toleranceCallback = cb; }
     public void setTextFontCallback(Consumer<String[]> cb) { this.textFontCallback = cb; }
     public void setLineWidthCallback(Consumer<Float> cb) { this.lineWidthCallback = cb; }
+    public void setCropApplyCallback(Runnable cb) { this.cropApplyCallback = cb; }
 
     // ---- Getters for current values ----
 
@@ -244,6 +254,31 @@ public class ToolOptionsBar extends JPanel {
     private JPanel buildGradientCard() {
         JPanel p = row();
         p.add(hint("Drag to set gradient direction  •  Uses foreground → secondary color"));
+        return p;
+    }
+
+    private JPanel buildCropCard() {
+        JPanel p = row();
+        p.add(hint("Drag to define crop area"));
+        p.add(sep());
+        JButton applyBtn = new JButton("Apply Crop  ↵");
+        applyBtn.setFocusPainted(false);
+        applyBtn.setBackground(new Color(0x0e7acc));
+        applyBtn.setForeground(Color.WHITE);
+        applyBtn.setFont(applyBtn.getFont().deriveFont(11f));
+        applyBtn.setPreferredSize(new Dimension(110, 24));
+        applyBtn.addActionListener(e -> { if (cropApplyCallback != null) cropApplyCallback.run(); });
+        p.add(applyBtn);
+        p.add(sep());
+        p.add(hint("Escape to cancel"));
+        return p;
+    }
+
+    private JPanel buildSmudgeCard() {
+        JPanel p = row();
+        p.add(label("Size")); p.add(brushSizeSpinner);
+        p.add(sep());
+        p.add(label("Strength %")); p.add(brushOpacitySpinner);
         return p;
     }
 

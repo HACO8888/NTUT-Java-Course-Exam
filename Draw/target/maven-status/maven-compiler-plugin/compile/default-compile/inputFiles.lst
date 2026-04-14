@@ -9,6 +9,7 @@
 /Users/haco/Project/Haco/NTUT-Java-Course-Exam/Draw/src/main/java/com/draw/model/Layer.java
 /Users/haco/Project/Haco/NTUT-Java-Course-Exam/Draw/src/main/java/com/draw/model/LayerModel.java
 /Users/haco/Project/Haco/NTUT-Java-Course-Exam/Draw/src/main/java/com/draw/tool/BrushTool.java
+/Users/haco/Project/Haco/NTUT-Java-Course-Exam/Draw/src/main/java/com/draw/tool/CropTool.java
 /Users/haco/Project/Haco/NTUT-Java-Course-Exam/Draw/src/main/java/com/draw/tool/DrawContext.java
 /Users/haco/Project/Haco/NTUT-Java-Course-Exam/Draw/src/main/java/com/draw/tool/EllipseTool.java
 /Users/haco/Project/Haco/NTUT-Java-Course-Exam/Draw/src/main/java/com/draw/tool/EraserTool.java
@@ -20,6 +21,7 @@
 /Users/haco/Project/Haco/NTUT-Java-Course-Exam/Draw/src/main/java/com/draw/tool/PolygonTool.java
 /Users/haco/Project/Haco/NTUT-Java-Course-Exam/Draw/src/main/java/com/draw/tool/RectSelectTool.java
 /Users/haco/Project/Haco/NTUT-Java-Course-Exam/Draw/src/main/java/com/draw/tool/RectangleTool.java
+/Users/haco/Project/Haco/NTUT-Java-Course-Exam/Draw/src/main/java/com/draw/tool/SmudgeTool.java
 /Users/haco/Project/Haco/NTUT-Java-Course-Exam/Draw/src/main/java/com/draw/tool/SprayTool.java
 /Users/haco/Project/Haco/NTUT-Java-Course-Exam/Draw/src/main/java/com/draw/tool/TextTool.java
 /Users/haco/Project/Haco/NTUT-Java-Course-Exam/Draw/src/main/java/com/draw/tool/Tool.java

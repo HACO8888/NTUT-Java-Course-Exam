@@ -94,6 +94,12 @@ public class RectSelectTool implements Tool {
         floatingImage = null;
     }
 
+    /** Select the entire canvas area. */
+    public void setFullSelection(int width, int height) {
+        selection = new Rectangle(0, 0, width, height);
+        state = State.SELECTED;
+    }
+
     // ---- Tool interface ----
 
     @Override

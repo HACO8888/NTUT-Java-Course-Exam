@@ -70,6 +70,22 @@ public class Layer {
         this.image = newImage;
     }
 
+    /** Crop the layer to the given rectangle (offset into the existing image). */
+    public void crop(int x, int y, int w, int h) {
+        int srcX = Math.max(0, x);
+        int srcY = Math.max(0, y);
+        int srcW = Math.min(w, image.getWidth()  - srcX);
+        int srcH = Math.min(h, image.getHeight() - srcY);
+        BufferedImage cropped = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
+        if (srcW > 0 && srcH > 0) {
+            Graphics2D g2 = cropped.createGraphics();
+            g2.drawImage(image.getSubimage(srcX, srcY, srcW, srcH),
+                    srcX - x, srcY - y, null);
+            g2.dispose();
+        }
+        this.image = cropped;
+    }
+
     public Layer snapshot() {
         BufferedImage copy = new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_INT_ARGB);
         Graphics2D g2 = copy.createGraphics();

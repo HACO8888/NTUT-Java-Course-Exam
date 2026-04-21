@@ -255,8 +255,10 @@ public class GameServer extends WebSocketServer {
     }
 
     public static void main(String[] args) {
-        int wsPort = 5555;
-        int httpPort = 5556;
+        // Read from env vars first (for cloud deployments like Zeabur)
+        int wsPort = parseEnvPort("PORT", 5555);
+        int httpPort = parseEnvPort("HTTP_PORT", 5556);
+
         if (args.length > 0) {
             try { wsPort = Integer.parseInt(args[0]); } catch (NumberFormatException ignored) {}
         }
@@ -267,5 +269,13 @@ public class GameServer extends WebSocketServer {
         GameServer server = new GameServer(wsPort);
         server.start();
         startHttpServer(httpPort);
+    }
+
+    private static int parseEnvPort(String envName, int defaultPort) {
+        String val = System.getenv(envName);
+        if (val != null && !val.isEmpty()) {
+            try { return Integer.parseInt(val.trim()); } catch (NumberFormatException ignored) {}
+        }
+        return defaultPort;
     }
 }

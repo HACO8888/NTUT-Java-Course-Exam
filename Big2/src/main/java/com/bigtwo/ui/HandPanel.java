@@ -62,6 +62,12 @@ public class HandPanel extends JPanel {
         this.onSelectionChange = r;
     }
 
+    public List<Card> getCards() {
+        List<Card> cards = new ArrayList<>();
+        for (CardPanel cp : cardPanels) cards.add(cp.getCard());
+        return cards;
+    }
+
     public List<Card> getSelectedCards() {
         List<Card> selected = new ArrayList<>();
         for (CardPanel cp : cardPanels) {

@@ -1,7 +1,7 @@
 (function() {
     'use strict';
 
-    // ── State ────────────────────────────────────��───────────────────
+    // ── State ────────────────────────────────────────────────────────
     let ws = null;
     let mySeat = -1;
     let playerCount = 0;
@@ -24,7 +24,7 @@
         SINGLE:'單張', PAIR:'對子', STRAIGHT:'順子', FLUSH:'同花',
         FULL_HOUSE:'葫蘆', FOUR_OF_A_KIND:'四條', STRAIGHT_FLUSH:'同花順'
     };
-    const avatarColors = ['#38BD6E', '#4A8AFF', '#E08A32', '#A06AFF'];
+    const avatarColors = ['#2E8B57', '#4A8AFF', '#D4A843', '#A06AFF'];
 
     // ── DOM refs ─────────────────────────────────────────────────────
     const $ = id => document.getElementById(id);
@@ -36,14 +36,18 @@
 
     // ── WebSocket ────────────────────────────────────────────────────
     function connect(callback) {
-        let addr = ($('serverAddr').value || '').trim();
-        if (!addr) addr = 'api-big2.haco.tw';
-        const protocol = window.location.protocol === 'https:' ? 'wss://' : 'ws://';
-        ws = new WebSocket(protocol + addr);
-        ws.onopen = () => callback();
-        ws.onclose = () => { ws = null; };
-        ws.onerror = () => alert('無法連接伺服器！');
-        ws.onmessage = e => handleMessage(JSON.parse(e.data));
+        fetch('/api/config')
+            .then(r => r.json())
+            .then(config => {
+                const protocol = window.location.protocol === 'https:' ? 'wss://' : 'ws://';
+                const host = window.location.hostname + ':' + config.wsPort;
+                ws = new WebSocket(protocol + host);
+                ws.onopen = () => callback();
+                ws.onclose = () => { ws = null; };
+                ws.onerror = () => alert('無法連接伺服器！');
+                ws.onmessage = e => handleMessage(JSON.parse(e.data));
+            })
+            .catch(() => alert('無法取得伺服器設定！'));
     }
 
     function send(obj) {
@@ -175,7 +179,6 @@
         if (isCreator) {
             $('startGameBtn').disabled = count < 3;
         }
-        // AI buttons
         document.querySelectorAll('.seat-slot').forEach(slot => {
             const idx = parseInt(slot.dataset.seat);
             const btn = slot.querySelector('.ai-btn');
@@ -185,10 +188,12 @@
             } else if (seatData[idx].isAI) {
                 btn.style.display = '';
                 btn.textContent = '移除';
+                btn.className = 'ai-btn btn btn-danger btn-sm';
                 btn.onclick = () => send({ type: 'REMOVE_AI', slotIndex: idx });
             } else {
                 btn.style.display = '';
                 btn.textContent = '+ AI';
+                btn.className = 'ai-btn btn btn-ghost btn-sm';
                 btn.onclick = () => send({ type: 'ADD_AI', slotIndex: idx });
             }
         });
@@ -227,7 +232,7 @@
         for (let i = 1; i < playerCount; i++) {
             const actualSeat = (mySeat + i) % playerCount;
             const slot = document.createElement('div');
-            slot.className = 'glass-panel opponent-slot';
+            slot.className = 'panel opponent-slot';
             slot.dataset.seat = actualSeat;
 
             const badge = document.createElement('div');
@@ -286,7 +291,6 @@
             };
             container.appendChild(el);
         });
-        // Update my card count
         const myActualCards = myHand.length;
         cardCounts[mySeat] = myActualCards;
         const myBadgeCards = document.querySelector('#myInfoPanel .badge-cards');
@@ -312,7 +316,7 @@
     }
 
     function clearTable() {
-        $('tableCards').innerHTML = '<div class="table-empty">桌面空白 — 等待出牌</div>';
+        $('tableCards').innerHTML = '<div class="table-empty">等待出牌</div>';
         $('tableInfo').textContent = '';
     }
 
@@ -340,7 +344,7 @@
         addLog(msg.playerName + ' 出牌: ' + msg.cards.map(c => suitSymbols[c.suit] + rankSymbols[c.rank]).join(' '));
 
         if (msg.newRound) {
-            addLog('--- 新的一輪，桌面清空 ---');
+            addLog('── 新的一輪 ──');
             clearTable();
         }
 
@@ -353,7 +357,7 @@
         addLog(playerNames[msg.seatIndex] + ' Pass');
 
         if (msg.newRound) {
-            addLog('--- 新的一輪，桌面清空 ---');
+            addLog('── 新的一輪 ──');
             clearTable();
         }
 
@@ -375,7 +379,7 @@
         const iWon = msg.winnerSeat === mySeat;
         $('resultIcon').textContent = iWon ? '🏆' : '😔';
         $('resultTitle').textContent = iWon ? '恭喜獲勝！' : '本局結束';
-        $('resultTitle').style.color = iWon ? '#FFD73C' : '#B4B4DC';
+        $('resultTitle').style.color = iWon ? 'var(--gold-bright)' : 'var(--text-secondary)';
         $('resultSub').textContent = iWon ? '你擊敗了所有對手！' : msg.winnerName + ' 贏得本局';
         $('resultModal').style.display = 'flex';
     }
@@ -389,7 +393,6 @@
     }
 
     function updateGameUI() {
-        // Update opponent fans and badges
         for (let i = 1; i < playerCount; i++) {
             const actualSeat = (mySeat + i) % playerCount;
             const fan = document.getElementById('fan-' + actualSeat);
@@ -403,7 +406,6 @@
             }
         }
 
-        // My badge
         const myBadge = $('myInfoPanel');
         myBadge.classList.toggle('active', currentSeat === mySeat);
 

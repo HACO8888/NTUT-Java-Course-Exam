@@ -218,9 +218,22 @@ public class GameServer extends WebSocketServer {
 
     // ── Static file server for web client ────────────────────────────
 
-    public static void startHttpServer(int httpPort) {
+    private static int wsPortForConfig;
+
+    public static void startHttpServer(int httpPort, int wsPort) {
+        wsPortForConfig = wsPort;
         try {
             HttpServer httpServer = HttpServer.create(new InetSocketAddress(httpPort), 0);
+
+            httpServer.createContext("/api/config", exchange -> {
+                String json = "{\"wsPort\":" + wsPortForConfig + "}";
+                byte[] data = json.getBytes();
+                exchange.getResponseHeaders().set("Content-Type", "application/json; charset=utf-8");
+                exchange.sendResponseHeaders(200, data.length);
+                exchange.getResponseBody().write(data);
+                exchange.getResponseBody().close();
+            });
+
             httpServer.createContext("/", exchange -> {
                 String path = exchange.getRequestURI().getPath();
                 if (path.equals("/")) path = "/index.html";
@@ -268,7 +281,7 @@ public class GameServer extends WebSocketServer {
 
         GameServer server = new GameServer(wsPort);
         server.start();
-        startHttpServer(httpPort);
+        startHttpServer(httpPort, wsPort);
     }
 
     private static int parseEnvPort(String envName, int defaultPort) {

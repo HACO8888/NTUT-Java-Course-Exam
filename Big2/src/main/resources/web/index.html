@@ -9,72 +9,79 @@
 <body>
     <!-- Lobby -->
     <div id="lobby" class="screen active">
-        <div class="lobby-container">
-            <h1 class="lobby-title">大老二 Online</h1>
-            <p class="lobby-subtitle">線上多人大老二</p>
-            <div class="glass-panel lobby-form">
-                <label class="field-label">玩家名稱</label>
-                <input type="text" id="playerName" class="styled-input" placeholder="請輸入你的名稱" maxlength="12">
+        <div class="lobby-wrapper">
+            <div class="lobby-brand stagger">
+                <div class="lobby-icon">♠</div>
+                <h1 class="lobby-title title-display">大老二</h1>
+                <p class="lobby-subtitle">線上多人撲克</p>
+            </div>
+            <div class="panel lobby-form stagger">
+                <div class="input-group">
+                    <label class="input-label" for="playerName">玩家名稱</label>
+                    <input type="text" id="playerName" class="input-field" placeholder="輸入你的名稱" maxlength="12">
+                </div>
 
-                <label class="field-label">伺服器位址</label>
-                <input type="text" id="serverAddr" class="styled-input" placeholder="api-big2.haco.tw" value="">
+                <button id="createRoomBtn" class="btn btn-gold" style="width:100%">建立房間</button>
 
-                <div class="divider-space"></div>
+                <div class="lobby-divider"></div>
+                <div class="lobby-or">或加入現有房間</div>
 
-                <button id="createRoomBtn" class="pill-btn green">建立房間</button>
+                <div class="input-group">
+                    <label class="input-label" for="roomCodeInput">房間代碼</label>
+                    <input type="text" id="roomCodeInput" class="input-field" placeholder="輸入四位代碼" maxlength="4" style="text-transform:uppercase; letter-spacing:0.2em; text-align:center">
+                </div>
 
-                <div class="divider-space"></div>
-                <label class="field-label">房間代碼</label>
-                <input type="text" id="roomCodeInput" class="styled-input" placeholder="輸入房間代碼" maxlength="4" style="text-transform:uppercase">
-
-                <button id="joinRoomBtn" class="pill-btn blue">加入房間</button>
+                <button id="joinRoomBtn" class="btn btn-jade" style="width:100%">加入房間</button>
             </div>
         </div>
     </div>
 
     <!-- Waiting Room -->
     <div id="waitingRoom" class="screen">
-        <div class="waiting-container">
-            <h2 class="waiting-title">等待室</h2>
-            <p class="waiting-subtitle">房間代碼</p>
-            <div id="roomCodeDisplay" class="room-code">----</div>
+        <div class="waiting-wrapper">
+            <div class="waiting-header stagger">
+                <p class="waiting-label">等待室</p>
+                <h2 class="waiting-title title-display">房間代碼</h2>
+                <div id="roomCodeDisplay" class="room-code-display">----</div>
+                <p class="room-code-hint">分享此代碼邀請好友加入</p>
+            </div>
 
-            <div class="glass-panel seats-grid">
+            <div class="panel seats-panel">
                 <div class="seat-slot" data-seat="0">
                     <div class="seat-info">
                         <span class="seat-name">空位</span>
                         <span class="seat-status">座位 1</span>
                     </div>
-                    <button class="ai-btn pill-btn small blue" style="display:none">+ AI</button>
+                    <button class="ai-btn btn btn-ghost btn-sm" style="display:none">+ AI</button>
                 </div>
                 <div class="seat-slot" data-seat="1">
                     <div class="seat-info">
                         <span class="seat-name">空位</span>
                         <span class="seat-status">座位 2</span>
                     </div>
-                    <button class="ai-btn pill-btn small blue" style="display:none">+ AI</button>
+                    <button class="ai-btn btn btn-ghost btn-sm" style="display:none">+ AI</button>
                 </div>
                 <div class="seat-slot" data-seat="2">
                     <div class="seat-info">
                         <span class="seat-name">空位</span>
                         <span class="seat-status">座位 3</span>
                     </div>
-                    <button class="ai-btn pill-btn small blue" style="display:none">+ AI</button>
+                    <button class="ai-btn btn btn-ghost btn-sm" style="display:none">+ AI</button>
                 </div>
                 <div class="seat-slot" data-seat="3">
                     <div class="seat-info">
                         <span class="seat-name">空位</span>
                         <span class="seat-status">座位 4</span>
                     </div>
-                    <button class="ai-btn pill-btn small blue" style="display:none">+ AI</button>
+                    <button class="ai-btn btn btn-ghost btn-sm" style="display:none">+ AI</button>
                 </div>
             </div>
 
-            <div id="waitingStatus" class="status-text">等待玩家加入...</div>
+            <div id="waitingStatus" class="waiting-status">等待玩家加入...</div>
 
             <div class="btn-row">
-                <button id="startGameBtn" class="pill-btn green" style="display:none" disabled>開始遊戲</button>
-                <button id="leaveRoomBtn" class="pill-btn red">離開房間</button>
+                <button id="startGameBtn" class="btn btn-gold" style="display:none" disabled>開始遊戲</button>
+                <button id="leaveRoomBtn" class="btn btn-danger">離開房間</button>
             </div>
         </div>
     </div>
@@ -87,13 +94,13 @@
 
             <!-- Center: table -->
             <div class="center-area">
-                <div class="glass-panel table-area">
+                <div class="panel table-area">
                     <div id="tableCards" class="table-cards">
-                        <div class="table-empty">桌面空白 — 等待出牌</div>
+                        <div class="table-empty">等待出牌</div>
                     </div>
                     <div id="tableInfo" class="table-info"></div>
                 </div>
-                <div class="glass-panel log-panel">
+                <div class="panel log-panel">
                     <div class="log-title">出牌紀錄</div>
                     <div id="gameLog" class="log-content"></div>
                 </div>
@@ -103,7 +110,7 @@
             <div class="bottom-area">
                 <div class="my-info-row">
                     <div id="myInfoPanel" class="player-badge">
-                        <div class="avatar" style="background:#38BD6E">我</div>
+                        <div class="avatar" style="background:var(--jade-dim)">我</div>
                         <div class="badge-text">
                             <span class="badge-name">我</span>
                             <span class="badge-cards">0 張</span>
@@ -112,13 +119,13 @@
                     <div id="statusText" class="status-text"></div>
                     <div id="handTypeChip" class="hand-type-chip"></div>
                 </div>
-                <div class="glass-panel hand-area">
+                <div class="panel hand-area">
                     <div id="myHand" class="hand-container"></div>
                 </div>
                 <div class="btn-row">
-                    <button id="playBtn" class="pill-btn green" disabled>出 牌</button>
-                    <button id="passBtn" class="pill-btn red" disabled>Pass</button>
-                    <button id="backBtn" class="pill-btn gray">返回大廳</button>
+                    <button id="playBtn" class="btn btn-gold" disabled>出 牌</button>
+                    <button id="passBtn" class="btn btn-danger" disabled>Pass</button>
+                    <button id="backBtn" class="btn btn-ghost">返回大廳</button>
                 </div>
             </div>
         </div>
@@ -126,11 +133,11 @@
 
     <!-- Result Modal -->
     <div id="resultModal" class="modal" style="display:none">
-        <div class="modal-content glass-panel">
+        <div class="modal-content panel">
             <div id="resultIcon" class="result-icon"></div>
-            <h2 id="resultTitle" class="result-title"></h2>
+            <h2 id="resultTitle" class="result-title title-display"></h2>
             <p id="resultSub" class="result-sub"></p>
-            <button id="resultOkBtn" class="pill-btn green">確定</button>
+            <button id="resultOkBtn" class="btn btn-gold">確定</button>
         </div>
     </div>
 

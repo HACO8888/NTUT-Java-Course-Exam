@@ -35,10 +35,10 @@ public class PlayerInfoPanel extends JPanel {
         setLayout(new BorderLayout(8, 0));
         setBorder(BorderFactory.createEmptyBorder(6, 10, 6, 12));
 
-        nameLabel.setFont(new Font("Microsoft JhengHei", Font.BOLD, 13));
+        nameLabel.setFont(new Font("Noto Sans TC", Font.BOLD, 13));
         nameLabel.setForeground(Color.WHITE);
 
-        countLabel.setFont(new Font("Microsoft JhengHei", Font.PLAIN, 11));
+        countLabel.setFont(new Font("Noto Sans TC", Font.PLAIN, 11));
         countLabel.setForeground(new Color(180, 180, 200));
 
         // Avatar placeholder (actual drawing done in paintComponent)
@@ -106,7 +106,7 @@ public class PlayerInfoPanel extends JPanel {
 
         // Initial
         g2.setColor(Color.WHITE);
-        g2.setFont(new Font("Microsoft JhengHei", Font.BOLD, 15));
+        g2.setFont(new Font("Noto Sans TC", Font.BOLD, 15));
         FontMetrics fm = g2.getFontMetrics();
         g2.drawString(initials, ax + (av - fm.stringWidth(initials)) / 2,
                       ay + av / 2 + fm.getAscent() / 2 - 2);

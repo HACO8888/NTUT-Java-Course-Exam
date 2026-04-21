@@ -59,6 +59,7 @@
             case 'PLAYER_LEFT': onPlayerLeft(msg); break;
             case 'AI_ADDED': onAIAdded(msg); break;
             case 'AI_REMOVED': onAIRemoved(msg); break;
+            case 'OWNER_CHANGED': onOwnerChanged(msg); break;
             case 'GAME_STARTED': onGameStarted(msg); break;
             case 'PLAY_RESULT': onPlayResult(msg); break;
             case 'PASS_RESULT': onPassResult(msg); break;
@@ -130,6 +131,14 @@
 
     function onAIRemoved(msg) {
         clearSeat(msg.seatIndex);
+        updateWaitingUI();
+    }
+
+    function onOwnerChanged(msg) {
+        isCreator = (msg.newOwnerSeat === mySeat);
+        if (isCreator) {
+            $('startGameBtn').style.display = '';
+        }
         updateWaitingUI();
     }
 

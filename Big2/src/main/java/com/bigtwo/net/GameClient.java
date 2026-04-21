@@ -73,6 +73,11 @@ public class GameClient extends WebSocketClient {
             case "PLAYER_LEFT":
                 listener.onPlayerLeft(JsonUtil.getInt(msg, "seatIndex"));
                 break;
+            case "OWNER_CHANGED":
+                listener.onOwnerChanged(
+                    JsonUtil.getInt(msg, "newOwnerSeat"),
+                    JsonUtil.getString(msg, "newOwnerName"));
+                break;
             case "AI_ADDED":
                 listener.onAIAdded(
                     JsonUtil.getInt(msg, "seatIndex"),

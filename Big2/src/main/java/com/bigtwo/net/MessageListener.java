@@ -8,6 +8,7 @@ public interface MessageListener {
     void onRoomJoined(String roomCode, int seatIndex, List<Map<String, Object>> players);
     void onPlayerJoined(String playerName, int seatIndex);
     void onPlayerLeft(int seatIndex);
+    void onOwnerChanged(int newOwnerSeat, String newOwnerName);
     void onAIAdded(int seatIndex, String name);
     void onAIRemoved(int seatIndex);
     void onGameStarted(Map<String, Object> data);

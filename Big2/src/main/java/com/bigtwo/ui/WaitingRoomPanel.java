@@ -10,8 +10,8 @@ public class WaitingRoomPanel extends JPanel {
 
     private static final Color PANEL_BG = new Color(255, 255, 255, 10);
     private static final Color DIVIDER = new Color(255, 255, 255, 18);
-    private static final Font FONT_BOLD = new Font("Microsoft JhengHei", Font.BOLD, 14);
-    private static final Font FONT_UI = new Font("Microsoft JhengHei", Font.PLAIN, 13);
+    private static final Font FONT_BOLD = new Font("Noto Sans TC", Font.BOLD, 14);
+    private static final Font FONT_UI = new Font("Noto Sans TC", Font.PLAIN, 13);
 
     private final JLabel roomCodeLabel = new JLabel("", SwingConstants.CENTER);
     private final JLabel statusLabel = new JLabel("等待玩家加入...", SwingConstants.CENTER);
@@ -89,7 +89,7 @@ public class WaitingRoomPanel extends JPanel {
         center.setBorder(new EmptyBorder(60, 0, 0, 0));
 
         JLabel title = new JLabel("等待室");
-        title.setFont(new Font("Microsoft JhengHei", Font.BOLD, 28));
+        title.setFont(new Font("Noto Sans TC", Font.BOLD, 28));
         title.setForeground(new Color(235, 235, 245));
         title.setAlignmentX(CENTER_ALIGNMENT);
         center.add(title);
@@ -167,7 +167,7 @@ public class WaitingRoomPanel extends JPanel {
         seatNameLabels[index] = nameLabel;
 
         JLabel statusLbl = new JLabel("座位 " + (index + 1), SwingConstants.LEFT);
-        statusLbl.setFont(new Font("Microsoft JhengHei", Font.PLAIN, 11));
+        statusLbl.setFont(new Font("Noto Sans TC", Font.PLAIN, 11));
         statusLbl.setForeground(new Color(100, 100, 130));
         seatStatusLabels[index] = statusLbl;
 
@@ -177,7 +177,7 @@ public class WaitingRoomPanel extends JPanel {
         textPanel.add(statusLbl, BorderLayout.SOUTH);
 
         JButton aiBtn = pillButton("+ AI", new Color(70, 100, 200), Color.WHITE);
-        aiBtn.setFont(new Font("Microsoft JhengHei", Font.BOLD, 11));
+        aiBtn.setFont(new Font("Noto Sans TC", Font.BOLD, 11));
         aiBtn.setBorder(new EmptyBorder(4, 12, 4, 12));
         aiBtn.setVisible(false);
         final int slot = index;
@@ -267,7 +267,7 @@ public class WaitingRoomPanel extends JPanel {
             }
             @Override protected void paintBorder(Graphics g) {}
         };
-        btn.setFont(new Font("Microsoft JhengHei", Font.BOLD, 14));
+        btn.setFont(new Font("Noto Sans TC", Font.BOLD, 14));
         btn.setForeground(fg);
         btn.setContentAreaFilled(false);
         btn.setFocusPainted(false);

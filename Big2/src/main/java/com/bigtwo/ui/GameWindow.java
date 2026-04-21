@@ -24,9 +24,9 @@ public class GameWindow extends JFrame implements MessageListener {
     private static final Color DIVIDER  = new Color(255, 255, 255, 18);
     private static final Color ACCENT   = new Color(99, 179, 255);
 
-    private static final Font FONT_BOLD  = new Font("Microsoft JhengHei", Font.BOLD,  14);
-    private static final Font FONT_UI    = new Font("Microsoft JhengHei", Font.PLAIN, 13);
-    private static final Font FONT_SMALL = new Font("Microsoft JhengHei", Font.PLAIN, 11);
+    private static final Font FONT_BOLD  = new Font("Noto Sans TC", Font.BOLD,  14);
+    private static final Font FONT_UI    = new Font("Noto Sans TC", Font.PLAIN, 13);
+    private static final Font FONT_SMALL = new Font("Noto Sans TC", Font.PLAIN, 11);
 
     // ── Mode ─────────────────────────────────────────────────────────
     private boolean offlineMode = false;
@@ -324,6 +324,13 @@ public class GameWindow extends JFrame implements MessageListener {
     }
 
     @Override
+    public void onOwnerChanged(int newOwnerSeat, String newOwnerName) {
+        boolean iAmOwner = (newOwnerSeat == mySeat);
+        waitingPanel.setIsCreator(iAmOwner);
+        waitingPanel.updateStartButton();
+    }
+
+    @Override
     public void onAIAdded(int seatIndex, String name) {
         waitingPanel.setSeat(seatIndex, name, true, false);
     }
@@ -518,7 +525,7 @@ public class GameWindow extends JFrame implements MessageListener {
         bar.setBorder(new EmptyBorder(0, 0, 10, 0));
 
         JLabel title = new JLabel("大老二");
-        title.setFont(new Font("Microsoft JhengHei", Font.BOLD, 20));
+        title.setFont(new Font("Noto Sans TC", Font.BOLD, 20));
         title.setForeground(new Color(235, 235, 245));
         title.setBorder(new EmptyBorder(0, 4, 0, 0));
 
@@ -709,11 +716,11 @@ public class GameWindow extends JFrame implements MessageListener {
         iconLabel.setFont(new Font("Segoe UI Emoji", Font.PLAIN, 48));
 
         JLabel titleLabel = new JLabel(iWon ? "恭喜獲勝！" : "本局結束", SwingConstants.CENTER);
-        titleLabel.setFont(new Font("Microsoft JhengHei", Font.BOLD, 26));
+        titleLabel.setFont(new Font("Noto Sans TC", Font.BOLD, 26));
         titleLabel.setForeground(iWon ? new Color(255, 215, 60) : new Color(180, 180, 220));
 
         JLabel subLabel = new JLabel(iWon ? "你擊敗了所有對手！" : winnerName + " 贏得本局", SwingConstants.CENTER);
-        subLabel.setFont(new Font("Microsoft JhengHei", Font.PLAIN, 15));
+        subLabel.setFont(new Font("Noto Sans TC", Font.PLAIN, 15));
         subLabel.setForeground(new Color(160, 160, 200));
 
         JPanel topArea = new JPanel(new BorderLayout(0, 8));
@@ -847,7 +854,7 @@ public class GameWindow extends JFrame implements MessageListener {
             }
             @Override protected void paintBorder(Graphics g) {}
         };
-        btn.setFont(new Font("Microsoft JhengHei", Font.BOLD, 14));
+        btn.setFont(new Font("Noto Sans TC", Font.BOLD, 14));
         btn.setForeground(fg);
         btn.setContentAreaFilled(false);
         btn.setFocusPainted(false);

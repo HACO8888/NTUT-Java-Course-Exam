@@ -52,7 +52,7 @@ public class TablePanel extends JPanel {
 
         if (currentPlay == null || currentPlay.isPass()) {
             // Empty state
-            g2.setFont(new Font("Microsoft JhengHei", Font.PLAIN, 15));
+            g2.setFont(new Font("Noto Sans TC", Font.PLAIN, 15));
             g2.setColor(new Color(255, 255, 255, 60));
             String msg = "桌面空白 — 等待出牌";
             FontMetrics fm = g2.getFontMetrics();
@@ -79,7 +79,7 @@ public class TablePanel extends JPanel {
 
             // Player + hand type label below cards
             if (!playerName.isEmpty()) {
-                g2.setFont(new Font("Microsoft JhengHei", Font.BOLD, 12));
+                g2.setFont(new Font("Noto Sans TC", Font.BOLD, 12));
                 String info = playerName + " · " + handTypeName;
                 FontMetrics fm = g2.getFontMetrics();
                 int lx = (w - fm.stringWidth(info)) / 2;

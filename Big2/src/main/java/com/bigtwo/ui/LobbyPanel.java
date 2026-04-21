@@ -12,10 +12,10 @@ public class LobbyPanel extends JPanel {
     private static final Color BG_BOT = new Color(10, 14, 26);
     private static final Color PANEL_BG = new Color(255, 255, 255, 10);
     private static final Color DIVIDER = new Color(255, 255, 255, 18);
-    private static final Font FONT_TITLE = new Font("Microsoft JhengHei", Font.BOLD, 36);
-    private static final Font FONT_SUBTITLE = new Font("Microsoft JhengHei", Font.PLAIN, 14);
-    private static final Font FONT_BOLD = new Font("Microsoft JhengHei", Font.BOLD, 14);
-    private static final Font FONT_UI = new Font("Microsoft JhengHei", Font.PLAIN, 13);
+    private static final Font FONT_TITLE = new Font("Noto Sans TC", Font.BOLD, 42);
+    private static final Font FONT_SUBTITLE = new Font("Noto Sans TC", Font.PLAIN, 14);
+    private static final Font FONT_BOLD = new Font("Noto Sans TC", Font.BOLD, 14);
+    private static final Font FONT_UI = new Font("Noto Sans TC", Font.PLAIN, 13);
 
     private static final String DEFAULT_SERVER = "api-big2.haco.tw";
 
@@ -44,7 +44,33 @@ public class LobbyPanel extends JPanel {
         center.setLayout(new BoxLayout(center, BoxLayout.Y_AXIS));
         center.setBorder(new EmptyBorder(80, 0, 0, 0));
 
-        JLabel title = new JLabel("大老二 Online");
+        JLabel icon = new JLabel("♠") {
+            @Override
+            protected void paintComponent(Graphics g) {
+                Graphics2D g2 = (Graphics2D) g.create();
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                int size = 56;
+                int x = (getWidth() - size) / 2;
+                int y = (getHeight() - size) / 2;
+                g2.setColor(new Color(30, 60, 45));
+                g2.fillOval(x, y, size, size);
+                g2.setColor(new Color(180, 140, 50, 80));
+                g2.setStroke(new BasicStroke(1.5f));
+                g2.drawOval(x, y, size, size);
+                g2.setColor(new Color(220, 220, 240));
+                g2.setFont(new Font("Serif", Font.PLAIN, 26));
+                FontMetrics fm = g2.getFontMetrics();
+                g2.drawString("♠", x + (size - fm.stringWidth("♠")) / 2, y + size / 2 + fm.getAscent() / 2 - 2);
+                g2.dispose();
+            }
+            @Override
+            public Dimension getPreferredSize() { return new Dimension(56, 56); }
+        };
+        icon.setAlignmentX(CENTER_ALIGNMENT);
+        center.add(icon);
+        center.add(Box.createVerticalStrut(12));
+
+        JLabel title = new JLabel("大老二");
         title.setFont(FONT_TITLE);
         title.setForeground(new Color(235, 235, 245));
         title.setAlignmentX(CENTER_ALIGNMENT);
@@ -52,7 +78,7 @@ public class LobbyPanel extends JPanel {
 
         center.add(Box.createVerticalStrut(6));
 
-        JLabel subtitle = new JLabel("線上多人大老二");
+        JLabel subtitle = new JLabel("線上多人撲克");
         subtitle.setFont(FONT_SUBTITLE);
         subtitle.setForeground(new Color(140, 140, 165));
         subtitle.setAlignmentX(CENTER_ALIGNMENT);
@@ -136,7 +162,7 @@ public class LobbyPanel extends JPanel {
             }
         };
         field.setOpaque(false);
-        field.setFont(new Font("Microsoft JhengHei", Font.PLAIN, 14));
+        field.setFont(new Font("Noto Sans TC", Font.PLAIN, 14));
         field.setForeground(new Color(230, 230, 245));
         field.setCaretColor(new Color(99, 179, 255));
         field.setBorder(new EmptyBorder(10, 14, 10, 14));
@@ -209,7 +235,7 @@ public class LobbyPanel extends JPanel {
             @Override
             protected void paintBorder(Graphics g) {}
         };
-        btn.setFont(new Font("Microsoft JhengHei", Font.BOLD, 14));
+        btn.setFont(new Font("Noto Sans TC", Font.BOLD, 14));
         btn.setForeground(fg);
         btn.setContentAreaFilled(false);
         btn.setFocusPainted(false);

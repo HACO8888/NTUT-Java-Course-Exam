@@ -328,13 +328,21 @@ public class Room {
     }
 
     private void reassignCreator() {
+        List<Integer> candidates = new ArrayList<>();
         for (int i = 0; i < 4; i++) {
-            if (seats[i] != null) {
-                creator = seats[i];
-                return;
-            }
+            if (seats[i] != null) candidates.add(i);
         }
-        creator = null;
+        if (candidates.isEmpty()) {
+            creator = null;
+            return;
+        }
+        int chosen = candidates.get(new Random().nextInt(candidates.size()));
+        creator = seats[chosen];
+
+        Map<String, Object> msg = JsonUtil.msg("OWNER_CHANGED");
+        msg.put("newOwnerSeat", chosen);
+        msg.put("newOwnerName", names[chosen]);
+        broadcast(JsonUtil.toJson(msg));
     }
 
     public synchronized boolean isEmpty() {

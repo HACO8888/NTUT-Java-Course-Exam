@@ -1,0 +1,12 @@
+# macOS
+.DS_Store
+**/.DS_Store
+
+# Maven build output
+**/target/
+
+# IDE
+.idea/
+*.iml
+.vscode/
+*.class

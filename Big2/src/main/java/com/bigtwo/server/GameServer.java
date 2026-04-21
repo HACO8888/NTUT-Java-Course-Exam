@@ -234,6 +234,31 @@ public class GameServer extends WebSocketServer {
                 exchange.getResponseBody().close();
             });
 
+            httpServer.createContext("/api/download", exchange -> {
+                try {
+                    java.io.File jarFile = new java.io.File(
+                            GameServer.class.getProtectionDomain().getCodeSource().getLocation().toURI());
+                    if (!jarFile.isFile()) {
+                        String msg = "Desktop version not available in dev mode";
+                        exchange.sendResponseHeaders(404, msg.length());
+                        exchange.getResponseBody().write(msg.getBytes());
+                        exchange.getResponseBody().close();
+                        return;
+                    }
+                    byte[] data = java.nio.file.Files.readAllBytes(jarFile.toPath());
+                    exchange.getResponseHeaders().set("Content-Type", "application/java-archive");
+                    exchange.getResponseHeaders().set("Content-Disposition", "attachment; filename=\"big2.jar\"");
+                    exchange.sendResponseHeaders(200, data.length);
+                    exchange.getResponseBody().write(data);
+                    exchange.getResponseBody().close();
+                } catch (Exception ex) {
+                    String err = "Download failed";
+                    exchange.sendResponseHeaders(500, err.length());
+                    exchange.getResponseBody().write(err.getBytes());
+                    exchange.getResponseBody().close();
+                }
+            });
+
             httpServer.createContext("/", exchange -> {
                 String path = exchange.getRequestURI().getPath();
                 if (path.equals("/")) path = "/index.html";

@@ -17,13 +17,14 @@ public class LobbyPanel extends JPanel {
     private static final Font FONT_BOLD = new Font("Microsoft JhengHei", Font.BOLD, 14);
     private static final Font FONT_UI = new Font("Microsoft JhengHei", Font.PLAIN, 13);
 
+    private static final String DEFAULT_SERVER = "api-big2.haco.tw";
+
     private final JTextField nameField = styledField("請輸入你的名稱");
-    private final JTextField serverField = styledField("api-big2.haco.tw");
     private final JTextField roomCodeField = styledField("輸入房間代碼");
 
     public interface LobbyCallback {
-        void onCreateRoom(String playerName, String serverAddress);
-        void onJoinRoom(String playerName, String serverAddress, String roomCode);
+        void onCreateRoom(String playerName);
+        void onJoinRoom(String playerName, String roomCode);
         void onOfflineMode();
     }
 
@@ -68,18 +69,13 @@ public class LobbyPanel extends JPanel {
         form.add(fieldLabel("玩家名稱"));
         form.add(Box.createVerticalStrut(6));
         form.add(nameField);
-        form.add(Box.createVerticalStrut(16));
-
-        form.add(fieldLabel("伺服器位址"));
-        form.add(Box.createVerticalStrut(6));
-        form.add(serverField);
         form.add(Box.createVerticalStrut(24));
 
         JButton createBtn = pillButton("建立房間", new Color(56, 189, 110), Color.WHITE);
         createBtn.setAlignmentX(CENTER_ALIGNMENT);
         createBtn.setMaximumSize(new Dimension(340, 44));
         createBtn.addActionListener(e -> {
-            if (callback != null) callback.onCreateRoom(nameField.getText().trim(), serverField.getText().trim());
+            if (callback != null) callback.onCreateRoom(nameField.getText().trim());
         });
         form.add(createBtn);
         form.add(Box.createVerticalStrut(12));
@@ -94,7 +90,7 @@ public class LobbyPanel extends JPanel {
         joinBtn.setMaximumSize(new Dimension(340, 44));
         joinBtn.addActionListener(e -> {
             if (callback != null)
-                callback.onJoinRoom(nameField.getText().trim(), serverField.getText().trim(), roomCodeField.getText().trim());
+                callback.onJoinRoom(nameField.getText().trim(), roomCodeField.getText().trim());
         });
         form.add(joinBtn);
         form.add(Box.createVerticalStrut(20));
@@ -162,12 +158,8 @@ public class LobbyPanel extends JPanel {
                 }
             }
         });
-        if (placeholder.startsWith("localhost") || placeholder.contains("haco.tw")) {
-            field.setForeground(new Color(230, 230, 245));
-        } else {
-            field.setText(placeholder);
-            field.setForeground(new Color(120, 120, 150));
-        }
+        field.setText(placeholder);
+        field.setForeground(new Color(120, 120, 150));
 
         return field;
     }

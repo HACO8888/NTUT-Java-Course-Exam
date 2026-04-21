@@ -86,8 +86,8 @@ public class GameWindow extends JFrame implements MessageListener {
         contentPanel.add(lobbyPanel, "lobby");
 
         lobbyPanel.setCallback(new LobbyPanel.LobbyCallback() {
-            public void onCreateRoom(String name, String server) { connectAndCreateRoom(name, server); }
-            public void onJoinRoom(String name, String server, String code) { connectAndJoinRoom(name, server, code); }
+            public void onCreateRoom(String name) { connectAndCreateRoom(name); }
+            public void onJoinRoom(String name, String code) { connectAndJoinRoom(name, code); }
             public void onOfflineMode() { startOfflineMode(); }
         });
 
@@ -106,17 +106,19 @@ public class GameWindow extends JFrame implements MessageListener {
     // ─────────────────────────────────────────────────────────────────
     //  Connection
     // ─────────────────────────────────────────────────────��───────────
-    private void connectAndCreateRoom(String name, String server) {
+    private static final String DEFAULT_SERVER = "api-big2.haco.tw";
+
+    private void connectAndCreateRoom(String name) {
         if (name.isEmpty()) { showError("請輸入玩家名稱！"); return; }
         myName = name;
-        connectToServer(server, () -> client.createRoom(name));
+        connectToServer(DEFAULT_SERVER, () -> client.createRoom(name));
     }
 
-    private void connectAndJoinRoom(String name, String server, String code) {
+    private void connectAndJoinRoom(String name, String code) {
         if (name.isEmpty()) { showError("請輸入玩家名稱！"); return; }
         if (code.isEmpty()) { showError("請輸入房間代碼！"); return; }
         myName = name;
-        connectToServer(server, () -> client.joinRoom(code.toUpperCase(), name));
+        connectToServer(DEFAULT_SERVER, () -> client.joinRoom(code.toUpperCase(), name));
     }
 
     private void connectToServer(String server, Runnable onConnect) {

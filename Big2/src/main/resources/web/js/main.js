@@ -36,18 +36,14 @@
 
     // ── WebSocket ────────────────────────────────────────────────────
     function connect(callback) {
-        fetch('/api/config')
-            .then(r => r.json())
-            .then(config => {
-                const protocol = window.location.protocol === 'https:' ? 'wss://' : 'ws://';
-                const host = window.location.hostname + ':' + config.wsPort;
-                ws = new WebSocket(protocol + host);
-                ws.onopen = () => callback();
-                ws.onclose = () => { ws = null; };
-                ws.onerror = () => alert('無法連接伺服器！');
-                ws.onmessage = e => handleMessage(JSON.parse(e.data));
-            })
-            .catch(() => alert('無法取得伺服器設定！'));
+        const wsUrl = window.location.hostname === 'localhost'
+            ? 'ws://localhost:5555'
+            : 'wss://api-big2.haco.tw';
+        ws = new WebSocket(wsUrl);
+        ws.onopen = () => callback();
+        ws.onclose = () => { ws = null; };
+        ws.onerror = () => alert('無法連接伺服器！');
+        ws.onmessage = e => handleMessage(JSON.parse(e.data));
     }
 
     function send(obj) {

@@ -281,6 +281,7 @@ public class GameServer extends WebSocketServer {
                 byte[] data = is.readAllBytes();
                 is.close();
                 exchange.getResponseHeaders().set("Content-Type", contentType + "; charset=utf-8");
+                exchange.getResponseHeaders().set("Cache-Control", "no-cache, must-revalidate");
                 exchange.sendResponseHeaders(200, data.length);
                 exchange.getResponseBody().write(data);
                 exchange.getResponseBody().close();

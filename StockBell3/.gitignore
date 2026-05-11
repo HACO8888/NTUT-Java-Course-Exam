@@ -1,0 +1,5 @@
+target/
+config.properties
+*.iml
+.idea/
+.DS_Store

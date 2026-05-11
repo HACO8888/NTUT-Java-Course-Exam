@@ -1,0 +1,5 @@
+# 複製此檔為 config.properties 後填值；config.properties 已 gitignore
+discord.webhook.url=
+poll.interval.seconds=15
+notify.channels=TRAY,CONSOLE,POPUP,DISCORD
+discord.username=股票通知1
